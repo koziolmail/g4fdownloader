@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Downloader
+namespace LinkCreator
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -22,6 +22,7 @@ namespace Downloader
     {
         public MainWindow()
         {
+            DataContext = new MainWindowModel();
             InitializeComponent();
         }
     }
