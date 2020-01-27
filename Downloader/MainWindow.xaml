@@ -1,0 +1,24 @@
+﻿<Window x:Class="Downloader.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Downloader"
+        d:DataContext="{d:DesignInstance local:MainWindowModel, IsDesignTimeCreatable=True}"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <TextBox HorizontalAlignment="Left" Margin="481,45,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="309" Height="199"/>
+        <Label Content="Wklej link poniżej" HorizontalAlignment="Left" Margin="481,14,0,0" VerticalAlignment="Top"/>
+        <Label Content="Informacje o pliku" HorizontalAlignment="Left" Margin="481,249,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.097,-0.525"/>
+        <Button Content="Pobierz" HorizontalAlignment="Left" Margin="481,280,0,0" VerticalAlignment="Top"/>
+        <!--<TextBox HorizontalAlignment="Left" Margin="481,33,0,0" Text="{Binding ConnectionModel.UserText}" TextWrapping="Wrap" VerticalAlignment="Top" Width="309"/>
+        <TextBox HorizontalAlignment="Left" Margin="481,56,0,0" Text="{Binding ConnectionModel.PassText}" TextWrapping="Wrap" VerticalAlignment="Top" Width="309"/>
+        <ListBox Margin="481,104,10,201"/>
+        <Button Content="Połącz" HorizontalAlignment="Left" Margin="481,79,0,0" VerticalAlignment="Top"/>
+        <Button Content="Odświerz" HorizontalAlignment="Left" Margin="524,79,0,0" VerticalAlignment="Top"/>
+        <Button Content="Pobierz" HorizontalAlignment="Left" Margin="481,261,0,0" VerticalAlignment="Top"/>
+        <TextBox HorizontalAlignment="Left" Margin="481,238,0,0" Text="katalog docelowy" TextWrapping="Wrap" VerticalAlignment="Top" Width="309"/>
+        <TextBox HorizontalAlignment="Left" Margin="481,286,0,0" Text="Postęp pobierania" TextWrapping="Wrap" VerticalAlignment="Top" Width="309"/>-->
+    </Grid>
+</Window>
