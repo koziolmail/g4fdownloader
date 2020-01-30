@@ -22,6 +22,7 @@ namespace Downloader
     {
         public MainWindow()
         {
+            DataContext = new MainWindowModel();
             InitializeComponent();
         }
     }

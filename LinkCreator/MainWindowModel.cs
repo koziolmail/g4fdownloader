@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Text;
+using ClassLibrary6;
 
 namespace LinkCreator
 {
@@ -21,14 +22,9 @@ namespace LinkCreator
             }
         }
 
-        private readonly LinkDto LinkDto = new LinkDto();
         private void CalcLink()
         {
-            LinkDto.Address = address;
-            LinkDto.User = user;
-            LinkDto.Pass = Pass;
-            LinkDto.Path = Path;
-            Link = Newtonsoft.Json.JsonConvert.SerializeObject(LinkDto);
+            Link = Newtonsoft.Json.JsonConvert.SerializeObject(new LinkDto(address, user, Pass, Path));
             OnPropertyChanged(nameof(Link));
             var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(Link);
             Base64Link = System.Convert.ToBase64String(plainTextBytes);
