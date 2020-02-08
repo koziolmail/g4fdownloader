@@ -1,31 +1,24 @@
-﻿using ClassLibrary6;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
 
-namespace Downloader
-{
-    class MainWindowBinding : INotifyPropertyChanged
-    {
+namespace Downloader {
+    class MainWindowBinding : INotifyPropertyChanged {
         private readonly IMainWindowModelAction Actions;
-        public MainWindowBinding(IMainWindowModelAction actions)
-        {
+        public MainWindowBinding(IMainWindowModelAction actions) {
             Actions = actions;
         }
         private string base64Link;
-        public string Base64Link
-        {
-            get
-            {
+        public string Base64Link {
+            get {
                 return base64Link;
             }
-            set
-            {
+            set {
                 base64Link = value;
                 LinkDto = Actions.DecalcLink(base64Link);
-                
+
                 if (LinkDto is LinkDto)
                     FileInfo = Path.GetFileName(LinkDto.Path);
                 else
@@ -33,42 +26,43 @@ namespace Downloader
             }
         }
 
-        
-        public LinkDto LinkDto { get; set; }
 
-        private string fileInfo;
-        public string FileInfo
-        {
-            get
-            {
+        public LinkDto LinkDto { get; set; }
+        private string fileInfo = "test";
+        public string FileInfo {
+            get {
                 return fileInfo;
             }
-            set
-            {
+            set {
                 fileInfo = value;
                 OnPropertyChanged(nameof(FileInfo));
             }
         }
 
         private string destinationPath;
-        public string DestinationPath
-        {
-            get
-            {
+        public string DestinationPath {
+            get {
                 return destinationPath;
             }
-            set
-            {
+            set {
                 destinationPath = value;
                 OnPropertyChanged(nameof(DestinationPath));
             }
-            
+
         }
 
-
+        private int progressValue;
+        public int ProgressValue {
+            get {
+                return progressValue;
+            }
+            set {
+                progressValue = value;
+                OnPropertyChanged(nameof(ProgressValue));
+            }
+        }
         public event PropertyChangedEventHandler PropertyChanged;
-        public void OnPropertyChanged(string propertyName)
-        {
+        public void OnPropertyChanged(string propertyName) {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }

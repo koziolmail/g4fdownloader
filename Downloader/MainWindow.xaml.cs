@@ -22,7 +22,7 @@ namespace Downloader
     {
         public MainWindow()
         {
-            DataContext = new MainWindowModel();
+            DataContext = new MainWindowModel(new Download.DownloadService());
             InitializeComponent();
         }
     }

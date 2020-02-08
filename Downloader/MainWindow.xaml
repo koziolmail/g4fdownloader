@@ -8,11 +8,12 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <TextBox HorizontalAlignment="Left" Margin="481,45,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="309" Height="199" Text="{Binding Binding.Base64Link, UpdateSourceTrigger=PropertyChanged}"/>
-        <Label Content="Wklej link poniżej" HorizontalAlignment="Left" Margin="481,14,0,0" VerticalAlignment="Top"/>
-        <Label Content="{Binding Binding.FileInfo}" HorizontalAlignment="Left" Margin="481,249,0,0" VerticalAlignment="Top"/>
-        <Button Content="Pobierz" HorizontalAlignment="Left" Margin="481,323,0,0" VerticalAlignment="Top" Command="{Binding DownloadCommand}"/>
-        <Button Content="Wybierz katalog docelowy" HorizontalAlignment="Left" Margin="481,272,0,0" VerticalAlignment="Top" Command="{Binding ChooseDestinationFolderCommand}"/>
-        <Label Content="{Binding Binding.DestinationPath}" HorizontalAlignment="Left" Margin="481,297,0,0" VerticalAlignment="Top"/>
+        <Label Content="Wklej link poniżej" Margin="10,10,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="103"/>
+        <TextBox HorizontalAlignment="Left" Margin="10,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="309" Height="199" Text="{Binding Binding.Base64Link, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label Content="{Binding Binding.FileInfo}" HorizontalAlignment="Left" Margin="10,245,0,0" VerticalAlignment="Top"/>
+        <Button Content="Pobierz" HorizontalAlignment="Left" Margin="10,316,0,0" VerticalAlignment="Top" Command="{Binding DownloadCommand}"/>
+        <Button Content="Wybierz katalog docelowy" HorizontalAlignment="Left" Margin="10,270,0,0" VerticalAlignment="Top" Command="{Binding ChooseDestinationFolderCommand}"/>
+        <Label Content="{Binding Binding.DestinationPath}" HorizontalAlignment="Left" Margin="10,295,0,0" VerticalAlignment="Top"/>
+        <ProgressBar Margin="10,341,0,0" Value="{Binding Binding.ProgressValue}" Height="28" VerticalAlignment="Top" HorizontalAlignment="Left" Width="292"/>
     </Grid>
 </Window>
