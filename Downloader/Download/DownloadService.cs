@@ -23,7 +23,8 @@ namespace Downloader.Download {
                 foreach (var nextResource in resourceProperties.Resources) {
                     if (nextResource.IsCollection) {
                         if (nextResource.Uri != resourceToDownloadUri) {
-                            var dirName = nextResource.Uri.Split(Path.AltDirectorySeparatorChar).SkipLast(1).Last();
+                            string[] resourceParts = nextResource.Uri.Split(Path.AltDirectorySeparatorChar);
+                            var dirName = (string)resourceParts.GetValue(resourceParts.Count()-2);
                             var newDestinationDir = Path.Combine(destinationDir, dirName);
                             System.IO.Directory.CreateDirectory(newDestinationDir);
                             await DownloadFolder(nextResource.Uri, newDestinationDir);
