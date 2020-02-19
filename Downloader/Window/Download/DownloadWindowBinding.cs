@@ -5,9 +5,9 @@ using System.IO;
 using System.Text;
 
 namespace Downloader {
-    class MainWindowBinding : INotifyPropertyChanged {
+    class DownloadWindowBinding : INotifyPropertyChanged {
         private readonly IMainWindowModelAction Actions;
-        public MainWindowBinding(IMainWindowModelAction actions) {
+        public DownloadWindowBinding(IMainWindowModelAction actions) {
             Actions = actions;
         }
         private string base64Link;
