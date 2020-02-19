@@ -1,0 +1,22 @@
+﻿<Window x:Class="Downloader.DownloadWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Downloader"
+        d:DataContext="{d:DesignInstance local:DownloadWindowModel, IsDesignTimeCreatable=True}"
+        mc:Ignorable="d"
+        Title="GOOD4FRAME DOWNLOADER" Height="720" Width="1280" Icon="/Window/Nowe-Logo-G4F.ico" MinWidth="482" MinHeight="650">
+    <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="/Window/Download/DownloadWindowBackground.png" Stretch="UniformToFill"/>
+        </Grid.Background>
+        <TextBox Grid.Column="1" HorizontalAlignment="Left" Margin="10,191,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="442" Height="161" Text="{Binding Binding.Base64Link, UpdateSourceTrigger=PropertyChanged}"/>
+        <Label Content="{Binding Binding.FileInfo}" HorizontalAlignment="Left" Margin="10,245,0,0" VerticalAlignment="Top" Height="10" Width="10"/>
+        <Button Content="POBIERZ" Width="130" HorizontalAlignment="Left" Margin="166,476,0,0" VerticalAlignment="Top" Command="{Binding DownloadCommand}" FontFamily="Calibri" FontSize="16" FontWeight="Bold" FontStyle="Normal"  Background="#FFDE5A4B" Foreground="White" Height="24"/>
+        <Button Content="WYBIERZ KATALOG DOCELOWY" Width="437" HorizontalAlignment="Left" Margin="15,404,0,0" VerticalAlignment="Top" Command="{Binding ChooseDestinationFolderCommand}" FontFamily="Calibri" FontSize="16" FontWeight="Bold" FontStyle="Normal" Background="#FFDE5A4B" Foreground="White" Height="24"/>
+        <Label Content="{Binding Binding.DestinationPath}" HorizontalAlignment="Left" Margin="10,295,0,0" VerticalAlignment="Top" Height="10" Width="10"/>
+        <ProgressBar Margin="15,550,0,0" Value="{Binding Binding.ProgressValue}" Height="28" VerticalAlignment="Top" HorizontalAlignment="Left" Width="437"/>
+        <Label Content="WKLEJ LINK PONIŻEJ" Margin="140,134,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="182" Background="#FFDE5A4B" FontFamily="Calibri" FontSize="16" FontWeight="Bold" FontStyle="Normal" Foreground="White" HorizontalContentAlignment="Center" Height="30"/>
+    </Grid>
+</Window>
