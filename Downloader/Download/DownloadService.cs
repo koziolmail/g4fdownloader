@@ -27,7 +27,7 @@ namespace Downloader.Download {
                             string[] resourceParts = nextResource.Uri.Split(Path.AltDirectorySeparatorChar);
                             var dirName = (string)resourceParts.GetValue(resourceParts.Count()-2);
                             var newDestinationDir = Path.Combine(destinationDir, dirName);
-                            System.IO.Directory.CreateDirectory(newDestinationDir);
+                            Directory.CreateDirectory(newDestinationDir);
                             await DownloadFolder(nextResource.Uri, newDestinationDir);
                         }
                     } else
@@ -43,8 +43,8 @@ namespace Downloader.Download {
                     byte[] buffer = new byte[8 * 1024];
                     long currentPosition = 0;
                     int len;
-                    while ((len = response.Stream.Read(buffer, 0, buffer.Length)) > 0) {
-                        fileStream.Write(buffer, 0, len);
+                    while ((len = await response.Stream.ReadAsync(buffer, 0, buffer.Length)) > 0) {
+                        await fileStream.WriteAsync(buffer, 0, len);
                         currentPosition += len;
                         SetProgress(currentPosition, fileResource.ContentLength);
                     }
