@@ -19,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="System.Web" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Window\Download\DownloadWindowBackground.png" />
     <Resource Include="Window\Intro\IntroWindowBackground.jpg" />
     <Resource Include="Window\Nowe-Logo-G4F.ico" />

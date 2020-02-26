@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using WebDav;
 using System.Linq;
 
@@ -36,7 +37,8 @@ namespace Downloader.Download {
         }
         async private Task DownloadFile(WebDavResource fileResource, string destinationDir) {
             using (var response = await Client.GetRawFile(fileResource.Uri)) {
-                string newFilePath = Path.Combine(destinationDir, Path.GetFileName(fileResource.Uri));
+                string decodedResourceUri = HttpUtility.UrlDecode(fileResource.Uri);
+                string newFilePath = Path.Combine(destinationDir, Path.GetFileName(decodedResourceUri));
                 using (var fileStream = File.Create(newFilePath)) {
                     byte[] buffer = new byte[8 * 1024];
                     long currentPosition = 0;
