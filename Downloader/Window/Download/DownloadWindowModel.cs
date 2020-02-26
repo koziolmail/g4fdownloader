@@ -2,6 +2,7 @@
 using GalaSoft.MvvmLight.Command;
 using System;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Downloader {
     class DownloadWindowModel : IMainWindowModelAction {
@@ -18,7 +19,7 @@ namespace Downloader {
             ChooseFolderService = chooseFolderService;
             LinkService = linkService;
             Binding = new DownloadWindowBinding(this);
-            DownloadCommand = new RelayCommand(Download, CanDownload);
+            DownloadCommand = new RelayCommand(DownloadAsync, CanDownload);
             ChooseDestinationFolderCommand = new RelayCommand(ChooseDestination, CanChooseDestinationFolder);
         }
 
@@ -51,16 +52,15 @@ namespace Downloader {
             return !IsBusy;
         }
 
-        public void Download() {
-            DownloadAsync();
-        }
         async void DownloadAsync() {
-            await Task.Run(DownloadDo);
+            string res = await Task.Run(DownloadDo);
+            MessageBox.Show(res);
+            Binding.FileInfo = res;
         }
-        async public Task DownloadDo() {
+        async public Task<string> DownloadDo() {
             try {
                 IsBusy = true;
-                await DownloadService.Download(Binding.LinkDto, Binding.DestinationPath, this);
+                return await DownloadService.Download(Binding.LinkDto, Binding.DestinationPath, this);
             } finally {
                 IsBusy = false;
             }
@@ -72,8 +72,9 @@ namespace Downloader {
             return IsLinkValid;
         }
 
-        public void SetProgress(int value) {
-            Binding.ProgressValue = value;
+        public void SetProgress(int percentValue, long fileSize, long downloadProgress, string currentFile, int fileInDirNo, int filesinDirCount) {
+            Binding.PercentPrograssValue = percentValue;
+            Binding.StringProgressValue = String.Format("{0:n0}kB / {1:n0}kB  - {2}% - plik {3} z {4} - {5}", downloadProgress/1024L, fileSize / 1024L, percentValue, fileInDirNo, filesinDirCount, currentFile);
         }
     }
 }

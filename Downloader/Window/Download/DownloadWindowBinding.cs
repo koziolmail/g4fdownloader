@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Downloader {
@@ -19,8 +20,10 @@ namespace Downloader {
                 base64Link = value;
                 LinkDto = Actions.DecalcLink(base64Link);
 
-                if (LinkDto is LinkDto)
-                    FileInfo = Path.GetFileName(LinkDto.Path);
+                if (LinkDto is LinkDto) {
+                    string[] resourceParts = LinkDto.Path.Split(Path.AltDirectorySeparatorChar);
+                    FileInfo = (string)resourceParts.GetValue(resourceParts.Count() - 2);
+                }
                 else
                     FileInfo = "";
             }
@@ -28,7 +31,7 @@ namespace Downloader {
 
 
         public LinkDto LinkDto { get; set; }
-        private string fileInfo = "test";
+        private string fileInfo = "Informacja o pobieranym filmie";
         public string FileInfo {
             get {
                 return fileInfo;
@@ -51,16 +54,30 @@ namespace Downloader {
 
         }
 
-        private int progressValue;
-        public int ProgressValue {
+        private int percentPrograssValue;
+        public int PercentPrograssValue {
             get {
-                return progressValue;
+                return percentPrograssValue;
             }
             set {
-                progressValue = value;
-                OnPropertyChanged(nameof(ProgressValue));
+                percentPrograssValue = value;
+                OnPropertyChanged(nameof(PercentPrograssValue));
             }
         }
+
+        private string stringProgressValue;
+        public string StringProgressValue {
+            get {
+                return stringProgressValue;
+            }
+            set {
+                stringProgressValue = value;
+                OnPropertyChanged(nameof(StringProgressValue));
+            }
+        }
+        
+
+
         public event PropertyChangedEventHandler PropertyChanged;
         public void OnPropertyChanged(string propertyName) {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
