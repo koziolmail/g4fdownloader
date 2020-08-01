@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using WebDav;
@@ -10,6 +11,7 @@ namespace Downloader.Download {
     class DownloadService {
         private IWebDavClient Client;
         private IMainWindowModelAction Action;
+        private bool pause = false;
         async internal Task<String> Download(LinkDto linkDto, string destinationDir, IMainWindowModelAction action) {
             try {
                 Action = action;
@@ -57,6 +59,9 @@ namespace Downloader.Download {
                     long currentPosition = 0;
                     int len;
                     while ((len = await response.Stream.ReadAsync(buffer, 0, buffer.Length)) > 0) {
+                        while (pause) {
+                            Thread.Sleep(1000);
+                        }
                         await fileStream.WriteAsync(buffer, 0, len);
                         currentPosition += len;
                         SetProgress(currentPosition, fileResource.ContentLength??0, newFileName, fileInDirNo, filesinDirCount);
@@ -80,6 +85,10 @@ namespace Downloader.Download {
                 Credentials = new NetworkCredential(linkDto.User, linkDto.Pass)
             };
             return clientParams;
+        }
+
+        internal void PauseResume() {
+            pause = !pause;
         }
     }
 }

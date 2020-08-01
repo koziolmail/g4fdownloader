@@ -19,5 +19,6 @@
         <Button Content="POBIERZ"                                                           Margin="166,476,0,0"    HorizontalAlignment="Left" VerticalAlignment="Top" Width="130"    Command="{Binding DownloadCommand}" FontFamily="Calibri" FontSize="16" FontWeight="Bold" FontStyle="Normal"  Background="#FFDE5A4B" Foreground="White" Height="24"/>
         <ProgressBar Value="{Binding Binding.PercentPrograssValue}"                         Margin="15,520,0,0"     HorizontalAlignment="Left" VerticalAlignment="Top" Height="28"  Width="437"/>
         <Label Content="{Binding Binding.StringProgressValue}"                              Margin="10,560,0,0"     HorizontalAlignment="Left" VerticalAlignment="Top" Height="25" Width="442" HorizontalContentAlignment="Center"/>
+        <Button Content="WSTRZYMAJ / WZNÓW"                                                 Margin="146,600,0,0"    HorizontalAlignment="Left" VerticalAlignment="Top" Width="170"    Command="{Binding PauseResumeCommand}" FontFamily="Calibri" FontSize="16" FontWeight="Bold" FontStyle="Normal"  Background="#FFDE5A4B" Foreground="White" Height="24"/>
     </Grid>
 </Window>

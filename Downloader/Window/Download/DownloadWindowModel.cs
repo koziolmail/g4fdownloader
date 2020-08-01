@@ -35,12 +35,14 @@ namespace Downloader {
                 Application.Current.Dispatcher.Invoke(() => {
                     DownloadCommand.RaiseCanExecuteChanged();
                     ChooseDestinationFolderCommand.RaiseCanExecuteChanged();
+                    PauseResumeCommand.RaiseCanExecuteChanged();
                 });
             }
         }
         public DownloadWindowBinding Binding { get; private set; }
         public RelayCommand DownloadCommand { get; private set; }
         public RelayCommand ChooseDestinationFolderCommand { get; private set; }
+        public RelayCommand PauseResumeCommand { get; private set; }
         public DownloadWindowModel() { }
         public DownloadWindowModel(DownloadService downloadService, ChooseDirectoryService chooseFolderService, LinkService linkService) {
             DownloadService = downloadService;
@@ -49,6 +51,7 @@ namespace Downloader {
             Binding = new DownloadWindowBinding(this);
             DownloadCommand = new RelayCommand(DownloadAsync, CanDownload);
             ChooseDestinationFolderCommand = new RelayCommand(ChooseDestination, CanChooseDestinationFolder);
+            PauseResumeCommand = new RelayCommand(PauseResume, CanPauseResume);
         }
 
         public void ChooseDestination() {
@@ -97,6 +100,12 @@ namespace Downloader {
         public void SetProgress(int percentValue, long fileSize, long downloadProgress, string currentFile, int fileInDirNo, int filesinDirCount) {
             Binding.PercentPrograssValue = percentValue;
             Binding.StringProgressValue = String.Format("{0:n0}kB / {1:n0}kB  - {2}% - plik {3} z {4} - {5}", downloadProgress / 1024L, fileSize / 1024L, percentValue, fileInDirNo, filesinDirCount, currentFile);
+        }
+        public void PauseResume() {
+            DownloadService.PauseResume();
+        }
+        public bool CanPauseResume() {
+            return IsBusy;
         }
     }
 }
