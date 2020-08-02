@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
@@ -18,7 +20,7 @@ namespace Downloader.Download {
                 using (Client = new WebDavClient(ConnectParams(linkDto))) {
                     await DownloadFolder(linkDto.Path, destinationDir);
                 }
-            }catch(Exception ex) {
+            } catch (Exception ex) {
                 return ex.ToString();
             }
             return "";
@@ -34,39 +36,72 @@ namespace Downloader.Download {
                     }
                 }
                 foreach (var nextResource in resourceProperties.Resources) {
-                if (nextResource.IsCollection) {
-                    if (nextResource.Uri != resourceToDownloadUri) {
-                        string[] resourceParts = nextResource.Uri.Split(Path.AltDirectorySeparatorChar);
-                        var dirName = (string)resourceParts.GetValue(resourceParts.Count() - 2);
-                        var newDestinationDir = Path.Combine(destinationDir, dirName);
-                        Directory.CreateDirectory(newDestinationDir);
-                        await DownloadFolder(nextResource.Uri, newDestinationDir);
+                    if (nextResource.IsCollection) {
+                        if (nextResource.Uri != resourceToDownloadUri) {
+                            string[] resourceParts = nextResource.Uri.Split(Path.AltDirectorySeparatorChar);
+                            var dirName = (string)resourceParts.GetValue(resourceParts.Count() - 2);
+                            var newDestinationDir = Path.Combine(destinationDir, dirName);
+                            Directory.CreateDirectory(newDestinationDir);
+                            await DownloadFolder(nextResource.Uri, newDestinationDir);
+                        }
+                    } else {
+                        resourceNo++;
+                        await DownloadFile(nextResource, destinationDir, resourceNo, fileCount);
                     }
-                } else {
-                    resourceNo++;
-                    await DownloadFile(nextResource, destinationDir, resourceNo, fileCount);
-                }
                 }
             }
         }
         async private Task DownloadFile(WebDavResource fileResource, string destinationDir, int fileInDirNo, int filesinDirCount) {
+            string decodedResourceUri = HttpUtility.UrlDecode(fileResource.Uri);
+
+            string newFilePath = Path.Combine(destinationDir, Path.GetFileName(decodedResourceUri));
+
+            FileInfo fileinfo = new FileInfo(newFilePath);
+            if (fileinfo.Exists && fileinfo.Length == fileResource.ContentLength)
+                return;
+
+            if (fileinfo.Exists)
+                await DownloadFileFromLastPosition(fileinfo, fileInDirNo, filesinDirCount, fileResource);
+            else
+                await DownloadFileFromBeginning(fileinfo, fileInDirNo, filesinDirCount, fileResource);
+        }
+        async private Task DownloadFileFromBeginning(FileInfo fileinfo, int fileInDirNo, int filesinDirCount, WebDavResource fileResource) {
+            long downloadSize = fileResource.ContentLength ?? 0;
             using (var response = await Client.GetRawFile(fileResource.Uri)) {
-                string decodedResourceUri = HttpUtility.UrlDecode(fileResource.Uri);
-                string newFilePath = Path.Combine(destinationDir, Path.GetFileName(decodedResourceUri));
-                string newFileName = Path.GetFileName(newFilePath);
-                using (var fileStream = File.Create(newFilePath)) {
-                    byte[] buffer = new byte[8 * 1024];
-                    long currentPosition = 0;
-                    int len;
-                    while ((len = await response.Stream.ReadAsync(buffer, 0, buffer.Length)) > 0) {
-                        while (pause) {
-                            Thread.Sleep(1000);
-                        }
-                        await fileStream.WriteAsync(buffer, 0, len);
-                        currentPosition += len;
-                        SetProgress(currentPosition, fileResource.ContentLength??0, newFileName, fileInDirNo, filesinDirCount);
-                    }
+                using (var fileStream = fileinfo.Create()) {
+                    await WriteWebDavToFile(downloadSize, response.Stream, fileinfo, fileInDirNo, filesinDirCount, fileStream);
                 }
+            }
+        }
+        private static readonly int BLOCK_SIZE = 8 * 1024;
+        async private Task DownloadFileFromLastPosition(FileInfo fileinfo, int fileInDirNo, int filesinDirCount, WebDavResource fileResource) {
+            long starPos = (fileinfo.Length / BLOCK_SIZE) * BLOCK_SIZE;
+            var downloadParameters = new GetFileParameters {
+                Headers = new List<KeyValuePair<string, string>> {
+                    new KeyValuePair<string, string>("Range", "bytes=" + starPos.ToString() + "-" + fileResource.ContentLength)
+                }.AsReadOnly()
+            };
+            using (var response = await Client.GetRawFile(fileResource.Uri, downloadParameters)) {
+
+                using (var fileStream = fileinfo.OpenWrite()) {
+                    fileStream.Position = starPos;
+                    long downloadSize = (fileResource.ContentLength ?? 0) - starPos;
+                    await WriteWebDavToFile(downloadSize, response.Stream, fileinfo, fileInDirNo, filesinDirCount, fileStream);
+                }
+            }
+        }
+
+        async private Task WriteWebDavToFile(long downloadSize, Stream readStream, FileInfo fileinfo, int fileInDirNo, int filesinDirCount, FileStream fileStream) {
+            byte[] buffer = new byte[BLOCK_SIZE];
+            long currentPosition = 0;
+            int len;
+            while ((len = await readStream.ReadAsync(buffer, 0, buffer.Length)) > 0) {
+                while (pause) {
+                    Thread.Sleep(1000);
+                }
+                await fileStream.WriteAsync(buffer, 0, len);
+                currentPosition += len;
+                SetProgress(currentPosition, downloadSize, fileinfo.Name, fileInDirNo, filesinDirCount);
             }
         }
 

@@ -79,7 +79,6 @@ namespace Downloader {
         }
         async void DownloadAsync() {
             string res = await Task.Run(DownloadDo);
-            MessageBox.Show(res);
             Binding.FileInfo = res;
         }
         async public Task<string> DownloadDo() {
