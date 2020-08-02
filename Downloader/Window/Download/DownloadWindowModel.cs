@@ -2,24 +2,56 @@
 using GalaSoft.MvvmLight.Command;
 using System;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace Downloader {
     class DownloadWindowModel : IMainWindowModelAction {
         private readonly DownloadService DownloadService;
         private readonly ChooseDirectoryService ChooseFolderService;
         private readonly LinkService LinkService;
-
+        private bool isLinkValid = false;
+        private bool IsLinkValid {
+            get { return isLinkValid; }
+            set {
+                isLinkValid = value;
+                ChooseDestinationFolderCommand.RaiseCanExecuteChanged();
+                DownloadCommand.RaiseCanExecuteChanged();
+            }
+        }
+        private bool isDestinationPathSet = false;
+        private bool IsDestinationPathSet {
+            get { return isDestinationPathSet; }
+            set {
+                isDestinationPathSet = value;
+                DownloadCommand.RaiseCanExecuteChanged();
+            }
+        }
+        private bool isBusy = false;
+        public bool IsBusy {
+            get { return isBusy; }
+            set {
+                isBusy = value;
+                Application.Current.Dispatcher.Invoke(() => {
+                    DownloadCommand.RaiseCanExecuteChanged();
+                    ChooseDestinationFolderCommand.RaiseCanExecuteChanged();
+                    PauseResumeCommand.RaiseCanExecuteChanged();
+                });
+            }
+        }
         public DownloadWindowBinding Binding { get; private set; }
         public RelayCommand DownloadCommand { get; private set; }
         public RelayCommand ChooseDestinationFolderCommand { get; private set; }
+        public RelayCommand PauseResumeCommand { get; private set; }
         public DownloadWindowModel() { }
         public DownloadWindowModel(DownloadService downloadService, ChooseDirectoryService chooseFolderService, LinkService linkService) {
             DownloadService = downloadService;
             ChooseFolderService = chooseFolderService;
             LinkService = linkService;
             Binding = new DownloadWindowBinding(this);
-            DownloadCommand = new RelayCommand(Download, CanDownload);
+            DownloadCommand = new RelayCommand(DownloadAsync, CanDownload);
             ChooseDestinationFolderCommand = new RelayCommand(ChooseDestination, CanChooseDestinationFolder);
+            PauseResumeCommand = new RelayCommand(PauseResume, CanPauseResume);
         }
 
         public void ChooseDestination() {
@@ -27,20 +59,15 @@ namespace Downloader {
             if (path != "") {
                 Binding.DestinationPath = path;
                 IsDestinationPathSet = true;
-                DownloadCommand.RaiseCanExecuteChanged();
+
             }
         }
-
         public LinkDto DecalcLink(string base64Link) {
             LinkDto link = LinkService.DecalcLink(base64Link);
             IsLinkValid = link != null;
-            ChooseDestinationFolderCommand.RaiseCanExecuteChanged();
-            DownloadCommand.RaiseCanExecuteChanged();
+
             return link;
         }
-
-        public bool IsBusy { get; set; }
-
         public bool CanDownload() {
             if (!IsLinkValid)
                 return false;
@@ -50,30 +77,34 @@ namespace Downloader {
 
             return !IsBusy;
         }
-
-        public void Download() {
-            DownloadAsync();
-        }
         async void DownloadAsync() {
-            await Task.Run(DownloadDo);
+            string res = await Task.Run(DownloadDo);
+            Binding.FileInfo = res;
         }
-        async public Task DownloadDo() {
+        async public Task<string> DownloadDo() {
             try {
                 IsBusy = true;
-                await DownloadService.Download(Binding.LinkDto, Binding.DestinationPath, this);
+
+                return await DownloadService.Download(Binding.LinkDto, Binding.DestinationPath, this);
             } finally {
                 IsBusy = false;
             }
         }
-
-        private bool IsLinkValid { get; set; } = false;
-        private bool IsDestinationPathSet { get; set; } = false;
         public bool CanChooseDestinationFolder() {
-            return IsLinkValid;
-        }
+            if (!IsLinkValid)
+                return false;
 
-        public void SetProgress(int value) {
-            Binding.ProgressValue = value;
+            return !IsBusy;
+        }
+        public void SetProgress(int percentValue, long fileSize, long downloadProgress, string currentFile, int fileInDirNo, int filesinDirCount) {
+            Binding.PercentPrograssValue = percentValue;
+            Binding.StringProgressValue = String.Format("{0:n0}kB / {1:n0}kB  - {2}% - plik {3} z {4} - {5}", downloadProgress / 1024L, fileSize / 1024L, percentValue, fileInDirNo, filesinDirCount, currentFile);
+        }
+        public void PauseResume() {
+            DownloadService.PauseResume();
+        }
+        public bool CanPauseResume() {
+            return IsBusy;
         }
     }
 }
