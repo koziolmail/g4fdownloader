@@ -69,7 +69,7 @@ namespace Downloader.Download {
             long downloadSize = fileResource.ContentLength ?? 0;
             using (var response = await Client.GetRawFile(fileResource.Uri)) {
                 using (var fileStream = fileinfo.Create()) {
-                    await WriteWebDavToFile(downloadSize, response.Stream, fileinfo, fileInDirNo, filesinDirCount, fileStream);
+                    await WriteWebDavToFile(downloadSize, response.Stream, fileinfo, fileInDirNo, filesinDirCount, fileStream, 0);
                 }
             }
         }
@@ -85,15 +85,15 @@ namespace Downloader.Download {
 
                 using (var fileStream = fileinfo.OpenWrite()) {
                     fileStream.Position = starPos;
-                    long downloadSize = (fileResource.ContentLength ?? 0) - starPos;
-                    await WriteWebDavToFile(downloadSize, response.Stream, fileinfo, fileInDirNo, filesinDirCount, fileStream);
+                    long downloadSize = fileResource.ContentLength ?? 0;
+                    await WriteWebDavToFile(downloadSize, response.Stream, fileinfo, fileInDirNo, filesinDirCount, fileStream, starPos);
                 }
             }
         }
 
-        async private Task WriteWebDavToFile(long downloadSize, Stream readStream, FileInfo fileinfo, int fileInDirNo, int filesinDirCount, FileStream fileStream) {
+        async private Task WriteWebDavToFile(long downloadSize, Stream readStream, FileInfo fileinfo, int fileInDirNo, int filesinDirCount, FileStream fileStream, long startPosition) {
             byte[] buffer = new byte[BLOCK_SIZE];
-            long currentPosition = 0;
+            long currentPosition = startPosition;
             int len;
             while ((len = await readStream.ReadAsync(buffer, 0, buffer.Length)) > 0) {
                 while (pause) {
